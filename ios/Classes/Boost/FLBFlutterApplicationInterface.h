@@ -73,6 +73,13 @@ NS_ASSUME_NONNULL_BEGIN
                           params:(NSDictionary *)params
                         uniqueId:(NSString *)uniqueId;
 
+#pragma mark - joox private weibin
+- (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
+                         withEngine:(FlutterEngine* _Nullable)engine
+                            onStart:(void (^)(FlutterEngine *engine))callback;
+
+- (void)jx_destroyEngine;
+
 @end
 NS_ASSUME_NONNULL_END
 

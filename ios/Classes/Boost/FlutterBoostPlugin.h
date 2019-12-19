@@ -25,11 +25,12 @@
 
 #import "FLBPlatform.h"
 #import "FLBTypes.h"
-// weibinhuang
 NS_ASSUME_NONNULL_BEGIN
 @interface FlutterBoostPlugin : NSObject<FlutterPlugin>
 #pragma mark - Initializer
 + (instancetype)sharedInstance;
+
+
 
 /**
  * 初始化FlutterBoost混合栈环境。应在程序使用混合栈之前调用。如在AppDelegate中
@@ -119,5 +120,28 @@ NS_ASSUME_NONNULL_BEGIN
         exts:(NSDictionary *)exts
 onPageFinished:(void (^)(NSDictionary *))resultCallback
   completion:(void (^)(BOOL))completion;
+
+
+#pragma mark - joox private method weibin
+/**
+ * 初始化FlutterBoost混合栈环境。应在程序使用混合栈之前调用。如在AppDelegate中
+ *
+ * @param platform 平台层实现FLBPlatform的对象
+ * @param autoReleseEngine 当所有Flutter 页面退出时，释放页面
+ * @param callback 启动之后回调
+ */
+- (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
+                        autoReleseEngine:(BOOL)autoReleseEngine
+                         onStart:(void (^)(FlutterEngine *engine))callback;
+
+/**
+ * 释放Flutter Engine
+ */
+- (void)jx_releaseEngine;
+
+- (void)jx_addPageId:(NSString *)pageId;
+
+- (void)jx_removePageId:(NSString *)pageId;
+
 @end
 NS_ASSUME_NONNULL_END

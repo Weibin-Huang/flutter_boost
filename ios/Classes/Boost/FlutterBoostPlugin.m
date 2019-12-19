@@ -31,6 +31,8 @@
 #define NSNull2Nil(_x_) if([_x_ isKindOfClass: NSNull.class]) _x_ = nil;
 
 @interface FlutterBoostPlugin()
+@property (nonatomic, assign) BOOL autoReleseEngine;
+
 @end
 
 @implementation FlutterBoostPlugin
@@ -177,4 +179,46 @@
     id<FLBFlutterApplicationInterface> app = [[FlutterBoostPlugin sharedInstance] application];
     [app close:uniqueId result:resultData exts:exts completion:completion];
 }
+
+
+#pragma mark - joox private method weibin
+/**
+ * 初始化FlutterBoost混合栈环境。应在程序使用混合栈之前调用。如在AppDelegate中
+ *
+ * @param platform 平台层实现FLBPlatform的对象
+ * @param autoReleseEngine 当所有Flutter 页面退出时，释放页面
+ * @param callback 启动之后回调
+ */
+- (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
+                        autoReleseEngine:(BOOL)autoReleseEngine
+                            onStart:(void (^)(FlutterEngine *engine))callback{
+    if ([self isRunning]) {
+        return;
+    }
+    
+    _autoReleseEngine = autoReleseEngine;
+
+    static dispatch_once_t onceToken;
+    __weak __typeof__(self) weakSelf = self;
+    dispatch_once(&onceToken, ^{
+        __strong __typeof__(weakSelf) self = weakSelf;
+        self.factory = FLBFactory.new;
+        self.application = [self->_factory createApplication:platform];
+    });
+    
+    [self.application jx_startFlutterWithPlatform:platform withEngine:nil onStart:callback];
+   
+    
+    
+    
+}
+
+- (void)jx_releaseEngine{
+    if ([self isRunning] == NO) {
+        return;
+    }
+    [self.application jx_destroyEngine];
+
+}
+
 @end

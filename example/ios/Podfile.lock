@@ -1,3 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_boost (0.0.3):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `.symlinks/flutter/ios`)
+  - flutter_boost (from `/Users/alanwong/Work/flutter_boost/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: ".symlinks/flutter/ios"
+  flutter_boost:
+    :path: "/Users/alanwong/Work/flutter_boost/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_boost: 9a99fbbba270fa5c606892dc1f2503be7e86f94c
+
 PODFILE CHECKSUM: 2a757a7bdc03b37a2814666652fdff1cf694243f
 
 COCOAPODS: 1.7.5

@@ -104,7 +104,8 @@ static NSUInteger kInstanceCounter = 0;
 {
     kInstanceCounter--;
     if([self.class instanceCounter] == 0){
-        [FLUTTER_APP pause];
+//        [FLUTTER_APP pause];
+        [FLUTTER_APP jx_destroyEngine];
     }
 }
 
