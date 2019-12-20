@@ -334,6 +334,7 @@ public class FlutterBoost {
 
 
     public void boostDestroy() {
+        mPlatform.getApplication().unregisterActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
         if (mEngine != null) {
             mEngine.destroy();
         }
