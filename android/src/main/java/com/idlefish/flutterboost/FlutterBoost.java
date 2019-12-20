@@ -27,6 +27,7 @@ public class FlutterBoost {
     private Activity mCurrentActiveActivity;
     private PluginRegistry mRegistry;
     static FlutterBoost sInstance = null;
+    private boolean isShutDown = false;
 
     private long FlutterPostFrameCallTime = 0;
     private Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks;
@@ -158,6 +159,10 @@ public class FlutterBoost {
 
         flutterEngine.getDartExecutor().executeDartEntrypoint(entrypoint);
         mRegistry = new BoostPluginRegistry(createEngine());
+        if (isShutDown) {
+            mPlatform.getApplication().registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
+            isShutDown = false;
+        }
 
     }
 
@@ -346,6 +351,7 @@ public class FlutterBoost {
         mEngine = null;
         mRegistry = null;
         mCurrentActiveActivity = null;
+        isShutDown = true;
     }
 
 
