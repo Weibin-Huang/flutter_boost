@@ -102,6 +102,8 @@ static NSUInteger kInstanceCounter = 0;
 
 + (void)instanceCounterDecrease
 {
+
+    
     kInstanceCounter--;
     if([self.class instanceCounter] == 0){
 //        [FLUTTER_APP pause];
@@ -135,7 +137,9 @@ static NSUInteger kInstanceCounter = 0;
 
     [FLUTTER_APP removeViewController:self];
     
-    [self.class instanceCounterDecrease];
+    if (![self.name isEqualToString:kIgnoreMessageWithName]) {
+        [self.class instanceCounterDecrease];
+    }
 }
 
 - (void)viewDidLoad {
