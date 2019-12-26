@@ -27,6 +27,7 @@ public class FlutterBoost {
     private Activity mCurrentActiveActivity;
     private PluginRegistry mRegistry;
     static FlutterBoost sInstance = null;
+    private boolean isInit = false;
 
     private long FlutterPostFrameCallTime = 0;
     private Application.ActivityLifecycleCallbacks mActivityLifecycleCallbacks;
@@ -125,7 +126,6 @@ public class FlutterBoost {
                 }
             }
         };
-        platform.getApplication().registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
 
         if (mPlatform.whenEngineStart() == ConfigBuilder.IMMEDIATELY) {
 
@@ -158,6 +158,10 @@ public class FlutterBoost {
 
         flutterEngine.getDartExecutor().executeDartEntrypoint(entrypoint);
         mRegistry = new BoostPluginRegistry(createEngine());
+        if (!isInit) {
+            mPlatform.getApplication().registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
+            isInit = true;
+        }
 
     }
 
@@ -346,6 +350,7 @@ public class FlutterBoost {
         mEngine = null;
         mRegistry = null;
         mCurrentActiveActivity = null;
+        isInit = false;
     }
 
 
