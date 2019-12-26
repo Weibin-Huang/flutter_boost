@@ -133,15 +133,20 @@ onPageFinished:(void (^)(NSDictionary *))resultCallback
 - (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
                         autoReleseEngine:(BOOL)autoReleseEngine
                          onStart:(void (^)(FlutterEngine *engine))callback;
-
 /**
- * 释放Flutter Engine
- */
-- (void)jx_releaseEngine;
-
-- (void)jx_addPageId:(NSString *)pageId;
-
-- (void)jx_removePageId:(NSString *)pageId;
-
+* 立刻释放Engine
+*
+*/
+- (void)jx_releaseEngineImmediately;
+/**
+* 延迟释放Engine，在30秒之后就会关闭Engine
+*
+*/
+- (void)jx_StartReleaseEngineDelay;
+/**
+* 取消延迟释放Engine
+*
+*/
+- (void)jx_cancleReleseEngineDelay;
 @end
 NS_ASSUME_NONNULL_END

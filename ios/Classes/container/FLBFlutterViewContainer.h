@@ -32,5 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_DESIGNATED_INITIALIZER;
 - (void)surfaceUpdated:(BOOL)appeared;
 - (void)setEnableForRunnersBatch:(BOOL)enable;
++ (NSUInteger)instanceCounter;
 @end
 NS_ASSUME_NONNULL_END

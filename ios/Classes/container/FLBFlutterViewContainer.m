@@ -98,6 +98,7 @@ static NSUInteger kInstanceCounter = 0;
     if(kInstanceCounter == 1){
         [FLUTTER_APP resume];
     }
+    [[FlutterBoostPlugin sharedInstance]jx_cancleReleseEngineDelay];
 }
 
 + (void)instanceCounterDecrease
@@ -107,7 +108,7 @@ static NSUInteger kInstanceCounter = 0;
     kInstanceCounter--;
     if([self.class instanceCounter] == 0){
 //        [FLUTTER_APP pause];
-        [FLUTTER_APP jx_destroyEngine];
+        [[FlutterBoostPlugin sharedInstance]jx_StartReleaseEngineDelay];
     }
 }
 

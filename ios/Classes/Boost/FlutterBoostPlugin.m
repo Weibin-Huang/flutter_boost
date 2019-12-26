@@ -27,11 +27,12 @@
 #import "FLBFactory.h"
 #import "BoostMessageChannel.h"
 #import "FLBCollectionHelper.h"
-
+#import "FLBFlutterViewContainer.h"
 #define NSNull2Nil(_x_) if([_x_ isKindOfClass: NSNull.class]) _x_ = nil;
 
 @interface FlutterBoostPlugin()
 @property (nonatomic, assign) BOOL autoReleseEngine;
+@property (nonatomic, strong) NSTimer *engineTimer;
 
 @end
 
@@ -207,18 +208,28 @@
     });
     
     [self.application jx_startFlutterWithPlatform:platform withEngine:nil onStart:callback];
-   
-    
-    
-    
 }
 
-- (void)jx_releaseEngine{
-    if ([self isRunning] == NO) {
+- (void)jx_releaseEngineImmediately{
+    if ([self isRunning] == NO || [FLBFlutterViewContainer instanceCounter] != 0) {
         return;
     }
     [self.application jx_destroyEngine];
-
 }
 
+- (void)jx_StartReleaseEngineDelay{
+    if (_engineTimer != nil) {
+        [_engineTimer invalidate];
+        _engineTimer = nil;
+    }
+    _engineTimer = [NSTimer timerWithTimeInterval:30 target:self selector:@selector(jx_releaseEngineImmediately) userInfo:nil repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:_engineTimer forMode:NSRunLoopCommonModes];
+}
+
+-(void)jx_cancleReleseEngineDelay{
+    if (_engineTimer != nil) {
+        [_engineTimer invalidate];
+        _engineTimer = nil;
+    }
+}
 @end
