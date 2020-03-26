@@ -133,6 +133,16 @@ onPageFinished:(void (^)(NSDictionary *))resultCallback
 - (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
                         autoReleseEngine:(BOOL)autoReleseEngine
                          onStart:(void (^)(FlutterEngine *engine))callback;
+
+
+
+/// 设置是否需要自动释放flutter engine
+/// @param autoRelease value
+-(void)setAutoReleaseEngine:(BOOL)autoRelease;
+
+/// 获取是否需要自动释放flutter engine
+-(BOOL)isAutoReleaseEngine;
+
 /**
 * 立刻释放Engine
 *

@@ -210,6 +210,17 @@
     [self.application jx_startFlutterWithPlatform:platform withEngine:nil onStart:callback];
 }
 
+-(void)setAutoReleaseEngine:(BOOL)autoRelease{
+    _autoReleseEngine = autoRelease;
+    if (_autoReleseEngine == NO) {
+        [self jx_cancleReleseEngineDelay];
+    }
+}
+
+-(BOOL)isAutoReleaseEngine{
+    return _autoReleseEngine;
+}
+
 - (void)jx_releaseEngineImmediately{
     if ([self isRunning] == NO || [FLBFlutterViewContainer instanceCounter] != 0) {
         return;
@@ -218,6 +229,10 @@
 }
 
 - (void)jx_StartReleaseEngineDelay{
+    if (_autoReleseEngine == NO) {
+        return;
+    }
+    
     if (_engineTimer != nil) {
         [_engineTimer invalidate];
         _engineTimer = nil;
