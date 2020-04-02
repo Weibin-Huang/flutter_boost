@@ -131,9 +131,9 @@ public class ContainerRecord implements IContainerRecord {
 
 //        mContainer.getBoostFlutterView().onDestroy();
 
-        mManager.removeRecord(this);
-
         mManager.setContainerResult(this,-1,-1,null);
+
+        mManager.removeRecord(this);
 
         if (!mManager.hasContainerAppear()) {
 //            mContainer.getBoostFlutterView().onPause();

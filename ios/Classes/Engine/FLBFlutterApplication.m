@@ -235,4 +235,24 @@
     }
 }
 
+#pragma mark - joox private weibin
+-(void)jx_destroyEngine{
+    self.isRunning = NO;
+    [self.viewProvider.engine destroyContext];
+    self.viewProvider = nil;
+}
+
+- (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
+                      withEngine:(FlutterEngine* _Nullable)engine
+                         onStart:(void (^)(FlutterEngine *engine))callback
+{
+    if (self.isRunning == YES) {
+        return;
+    }
+    self.platform = platform;
+    self.viewProvider = [[FLBFlutterEngine alloc] initWithPlatform:platform engine:engine];
+    self.isRunning = YES;
+    if(callback) callback(self.viewProvider.engine);
+}
+
 @end

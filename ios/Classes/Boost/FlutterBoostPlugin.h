@@ -137,6 +137,44 @@ NS_ASSUME_NONNULL_BEGIN
 onPageFinished:(void (^)(NSDictionary *))resultCallback
   completion:(void (^)(BOOL))completion;
 
+
+#pragma mark - joox private method weibin
+/**
+ * 初始化FlutterBoost混合栈环境。应在程序使用混合栈之前调用。如在AppDelegate中
+ *
+ * @param platform 平台层实现FLBPlatform的对象
+ * @param autoReleseEngine 当所有Flutter 页面退出时，释放页面
+ * @param callback 启动之后回调
+ */
+- (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
+                        autoReleseEngine:(BOOL)autoReleseEngine
+                         onStart:(void (^)(FlutterEngine *engine))callback;
+
+
+
+/// 设置是否需要自动释放flutter engine
+/// @param autoRelease value
+-(void)setAutoReleaseEngine:(BOOL)autoRelease;
+
+/// 获取是否需要自动释放flutter engine
+-(BOOL)isAutoReleaseEngine;
+
+/**
+* 立刻释放Engine
+*
+*/
+- (void)jx_releaseEngineImmediately;
+/**
+* 延迟释放Engine，在30秒之后就会关闭Engine
+*
+*/
+- (void)jx_StartReleaseEngineDelay;
+/**
+* 取消延迟释放Engine
+*
+*/
+- (void)jx_cancleReleseEngineDelay;
+
 //切记：在destroyPluginContext前务必将所有FlutterViewController及其子类的实例销毁。在这里是FLBFlutterViewContainer。否则会异常;以下是全部步骤
 //1. 首先通过为所有FlutterPlugin的methodChannel属性设为nil来解除其与FlutterEngine的间接强引用
 //2. 销毁所有的FlutterViewController实例（或保证所有FlutterVC已经退出），来解除其与FlutterEngine的强引用，在每个VC卸载的时候FlutterEngine会调用destroyContext

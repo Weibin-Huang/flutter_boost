@@ -134,13 +134,17 @@ static NSUInteger kInstanceCounter = 0;
     if(kInstanceCounter == 1){
         [FLUTTER_APP resume];
     }
+    [[FlutterBoostPlugin sharedInstance]jx_cancleReleseEngineDelay];
 }
 
 + (void)instanceCounterDecrease
 {
+
+    
     kInstanceCounter--;
     if([self.class instanceCounter] == 0){
-        [FLUTTER_APP pause];
+//        [FLUTTER_APP pause];
+        [[FlutterBoostPlugin sharedInstance]jx_StartReleaseEngineDelay];
     }
 }
 
@@ -199,7 +203,9 @@ static NSUInteger kInstanceCounter = 0;
 
     [FLUTTER_APP removeViewController:self];
     
-    [self.class instanceCounterDecrease];
+    if (![self.name isEqualToString:kIgnoreMessageWithName]) {
+        [self.class instanceCounterDecrease];
+    }
 }
 
 - (void)viewDidLoad {
