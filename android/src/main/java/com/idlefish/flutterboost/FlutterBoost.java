@@ -363,7 +363,6 @@ public class FlutterBoost {
         }
         mEngine = null;
         mCurrentActiveActivity = null;
-        isInit = false;
     }
 
 
