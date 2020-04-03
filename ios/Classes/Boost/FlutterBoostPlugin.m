@@ -33,7 +33,7 @@
 @interface FlutterBoostPlugin()
 @property (nonatomic, assign) BOOL autoReleseEngine;
 @property (nonatomic, strong) NSTimer *engineTimer;
-
+@property (nonatomic, copy)  void(^releaseCallback) (FlutterEngine *engine); // 销毁之前的回调
 @end
 
 @implementation FlutterBoostPlugin
@@ -202,31 +202,25 @@
 
 
 #pragma mark - joox private method weibin
-/**
- * 初始化FlutterBoost混合栈环境。应在程序使用混合栈之前调用。如在AppDelegate中
- *
- * @param platform 平台层实现FLBPlatform的对象
- * @param autoReleseEngine 当所有Flutter 页面退出时，释放页面
- * @param callback 启动之后回调
- */
 - (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
-                        autoReleseEngine:(BOOL)autoReleseEngine
-                            onStart:(void (^)(FlutterEngine *engine))callback{
+                   autoReleseEngine:(BOOL)autoReleseEngine
+                            onStart:(void (^)(FlutterEngine *engine))callback
+                          onRelease:(void (^)(FlutterEngine *engine))releaseCallback
+{
     if ([self isRunning]) {
         return;
     }
 
     _autoReleseEngine = autoReleseEngine;
+    
+    self.releaseCallback = releaseCallback;
 
-    static dispatch_once_t onceToken;
-    __weak __typeof__(self) weakSelf = self;
-    dispatch_once(&onceToken, ^{
-        __strong __typeof__(weakSelf) self = weakSelf;
-        self.factory = FLBFactory.new;
-        self.application = [self->_factory createApplication:platform];
-    });
-
-    [self.application jx_startFlutterWithPlatform:platform withEngine:nil onStart:callback];
+    FLBFactory *factory = FLBFactory.new;
+    self.application = [factory createApplication:platform];
+    [self.application jx_startFlutterWithPlatform:platform
+                                    withEngine:nil
+                         withPluginRegisterred:YES
+                                       onStart:callback];
 }
 
 -(void)setAutoReleaseEngine:(BOOL)autoRelease{
@@ -244,7 +238,11 @@
     if ([self isRunning] == NO || [FLBFlutterViewContainer instanceCounter] != 0) {
         return;
     }
-    [self.application jx_destroyEngine];
+    if (self.releaseCallback) {
+        self.releaseCallback(self.application.flutterProvider.engine);
+        self.releaseCallback = nil;
+    }
+    [self destroyPluginContext];
 }
 
 - (void)jx_StartReleaseEngineDelay{

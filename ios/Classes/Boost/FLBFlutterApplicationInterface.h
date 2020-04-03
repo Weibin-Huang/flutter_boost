@@ -79,6 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - joox private weibin
 - (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
                          withEngine:(FlutterEngine* _Nullable)engine
+              withPluginRegisterred:(BOOL)registerPlugin
                             onStart:(void (^)(FlutterEngine *engine))callback;
 
 - (void)jx_destroyEngine;

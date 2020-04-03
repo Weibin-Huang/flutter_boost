@@ -139,16 +139,19 @@ onPageFinished:(void (^)(NSDictionary *))resultCallback
 
 
 #pragma mark - joox private method weibin
+
 /**
  * 初始化FlutterBoost混合栈环境。应在程序使用混合栈之前调用。如在AppDelegate中
  *
  * @param platform 平台层实现FLBPlatform的对象
  * @param autoReleseEngine 当所有Flutter 页面退出时，释放页面
  * @param callback 启动之后回调
+ * @param releaseCallback 释放之前回调
  */
 - (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
-                        autoReleseEngine:(BOOL)autoReleseEngine
-                         onStart:(void (^)(FlutterEngine *engine))callback;
+                   autoReleseEngine:(BOOL)autoReleseEngine
+                            onStart:(void (^)(FlutterEngine *engine))callback
+                          onRelease:(void (^)(FlutterEngine *engine))releaseCallback;
 
 
 

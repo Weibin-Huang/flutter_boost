@@ -97,6 +97,7 @@
 
 - (void)dealloc
 {
+    NSLog(@"weibinhuang dealloc %@",NSStringFromClass([self class]));
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
 }
@@ -236,22 +237,28 @@
 }
 
 #pragma mark - joox private weibin
--(void)jx_destroyEngine{
-    self.isRunning = NO;
-    [self.viewProvider.engine destroyContext];
-    self.viewProvider = nil;
-}
 
 - (void)jx_startFlutterWithPlatform:(id<FLBPlatform>)platform
                       withEngine:(FlutterEngine* _Nullable)engine
+                        withPluginRegisterred:(BOOL)registerPlugin
                          onStart:(void (^)(FlutterEngine *engine))callback
 {
-    if (self.isRunning == YES) {
+    if (self.isRunning) {
         return;
     }
     self.platform = platform;
     self.viewProvider = [[FLBFlutterEngine alloc] initWithPlatform:platform engine:engine];
     self.isRunning = YES;
+    if(registerPlugin){
+        Class clazz = NSClassFromString(@"GeneratedPluginRegistrant");
+        FlutterEngine *myengine = [self.viewProvider engine];
+        if (clazz && myengine) {
+            if ([clazz respondsToSelector:NSSelectorFromString(@"registerWithRegistry:")]) {
+                [clazz performSelector:NSSelectorFromString(@"registerWithRegistry:")
+                            withObject:myengine];
+            }
+        }
+    }
     if(callback) callback(self.viewProvider.engine);
 }
 

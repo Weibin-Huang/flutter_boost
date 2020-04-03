@@ -122,6 +122,8 @@
 }
 
 - (void)dealloc{
+    NSLog(@"weibinhuang dealloc %@",NSStringFromClass([self class]));
+
     [self.engine setViewController:nil];
 }
 @end
