@@ -82,9 +82,11 @@ public class FlutterViewContainerManager implements IContainerManager {
     void removeRecord(IContainerRecord record) {
         mRecordStack.remove(record);
         mRecordMap.remove(record.getContainer());
-//        if(mRecordMap.isEmpty()){
-//
-//        }
+        if(mRecordMap.isEmpty()){
+            if( FlutterBoost.instance().platform().whenEngineDestroy()== FlutterBoost.ConfigBuilder.All_FLUTTER_ACTIVITY_DESTROY){
+                FlutterBoost.instance().boostDestroy();
+            }
+        }
 
 
     }
