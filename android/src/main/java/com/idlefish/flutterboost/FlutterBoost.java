@@ -4,10 +4,9 @@ package com.idlefish.flutterboost;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import com.idlefish.flutterboost.interfaces.*;
 import io.flutter.embedding.android.FlutterView;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -51,7 +50,7 @@ public class FlutterBoost {
 
     public void init(Platform platform) {
         if (sInit){
-            Debuger.log("FlutterBoost is alread inited. Do not init twice");
+            Debuger.log("FlutterBoost is already initialized. Don't initialize it twice");
             return;
         }
 
@@ -65,6 +64,18 @@ public class FlutterBoost {
                 //fix crash：'FlutterBoostPlugin not register yet'
                 //case: initFlutter after Activity.OnCreate method，and then called start/stop crash
                 // In SplashActivity ,showDialog(in OnCreate method) to check permission, if authorized, then init sdk and jump homePage)
+
+                // fix bug : The LauncherActivity will be launch by clicking app icon when app enter background in HuaWei Rom, cause missing forgoround event
+                if(mEnterActivityCreate && mCurrentActiveActivity == null) {
+                    Intent intent = activity.getIntent();
+                    if (!activity.isTaskRoot()
+                            && intent != null
+                            && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
+                            && intent.getAction() != null
+                            && intent.getAction().equals(Intent.ACTION_MAIN)) {
+                        return;
+                    }
+                }
                 mEnterActivityCreate = true;
                 mCurrentActiveActivity = activity;
                 if (mPlatform.whenEngineStart() == ConfigBuilder.ANY_ACTIVITY_CREATED) {
@@ -177,7 +188,7 @@ public class FlutterBoost {
         }
         DartExecutor.DartEntrypoint entrypoint = new DartExecutor.DartEntrypoint(
                 FlutterMain.findAppBundlePath(),
-                "main"
+                mPlatform.dartEntrypoint()
         );
 
         flutterEngine.getDartExecutor().executeDartEntrypoint(entrypoint);
@@ -269,6 +280,9 @@ public class FlutterBoost {
 
                     return ConfigBuilder.this.isDebug;
                 }
+
+                @Override
+                public String dartEntrypoint() { return ConfigBuilder.this.dartEntrypoint; }
 
                 @Override
                 public String initialRoute() {

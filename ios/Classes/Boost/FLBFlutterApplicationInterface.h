@@ -84,6 +84,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)jx_destroyEngine;
 
+- (void)onShownContainerChanged:(NSString *)uniqueId
+                         params:(NSDictionary *)params;
+
 @end
 NS_ASSUME_NONNULL_END
 

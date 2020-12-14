@@ -1,10 +1,11 @@
 package com.idlefish.flutterboost.containers;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LifecycleRegistry;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LifecycleRegistry;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -15,12 +16,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.*;
 import android.widget.*;
 import com.idlefish.flutterboost.FlutterBoost;
 import com.idlefish.flutterboost.XFlutterView;
+import com.idlefish.flutterboost.XPlatformPlugin;
 import io.flutter.Log;
 import io.flutter.embedding.android.DrawableSplashScreen;
 import io.flutter.embedding.android.FlutterView;
@@ -55,6 +57,7 @@ public class BoostFlutterActivity extends Activity
     // Default configuration.
     protected static final String DEFAULT_BACKGROUND_MODE = BackgroundMode.opaque.name();
 
+    private static XPlatformPlugin sXPlatformPlugin;
 
     public static Intent createDefaultIntent(@NonNull Context launchContext) {
         return withNewEngine().build(launchContext);
@@ -70,7 +73,7 @@ public class BoostFlutterActivity extends Activity
         private final Class<? extends BoostFlutterActivity> activityClass;
         private String backgroundMode = DEFAULT_BACKGROUND_MODE;
         private String url = "";
-        private Map params = new HashMap();
+        private  Map<String ,Object> params = new HashMap();
 
 
         public NewEngineIntentBuilder(@NonNull Class<? extends BoostFlutterActivity> activityClass) {
@@ -84,7 +87,7 @@ public class BoostFlutterActivity extends Activity
         }
 
 
-        public NewEngineIntentBuilder params(@NonNull Map params) {
+        public NewEngineIntentBuilder params(@NonNull  Map<String ,Object> params) {
             this.params = params;
             return this;
         }
@@ -184,6 +187,7 @@ public class BoostFlutterActivity extends Activity
      */
     @Nullable
     @SuppressWarnings("deprecation")
+    @SuppressLint("WrongConstant")
     private Drawable getSplashScreenFromManifest() {
         try {
             ActivityInfo activityInfo = getPackageManager().getActivityInfo(
@@ -439,12 +443,8 @@ public class BoostFlutterActivity extends Activity
 
     @Nullable
     @Override
-    public PlatformPlugin providePlatformPlugin(@Nullable Activity activity, @NonNull FlutterEngine flutterEngine) {
-        if (activity != null) {
-            return new PlatformPlugin(getActivity(), flutterEngine.getPlatformChannel());
-        } else {
-            return null;
-        }
+    public XPlatformPlugin providePlatformPlugin(@NonNull FlutterEngine flutterEngine) {
+        return BoostViewUtils.getPlatformPlugin(flutterEngine.getPlatformChannel());
     }
 
     /**
@@ -480,14 +480,14 @@ public class BoostFlutterActivity extends Activity
     }
 
     @Override
-    public Map getContainerUrlParams() {
+    public  Map<String ,Object> getContainerUrlParams() {
 
         if (getIntent().hasExtra(EXTRA_PARAMS)) {
             SerializableMap serializableMap = (SerializableMap) getIntent().getSerializableExtra(EXTRA_PARAMS);
             return serializableMap.getMap();
         }
 
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
 
         return params;
     }

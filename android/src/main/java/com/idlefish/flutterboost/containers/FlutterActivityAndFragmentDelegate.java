@@ -2,16 +2,19 @@ package com.idlefish.flutterboost.containers;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.arch.lifecycle.Lifecycle;
+import androidx.lifecycle.Lifecycle;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.*;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -22,6 +25,7 @@ import java.util.Map;
 import com.idlefish.flutterboost.FlutterBoost;
 import com.idlefish.flutterboost.Utils;
 import com.idlefish.flutterboost.XFlutterView;
+import com.idlefish.flutterboost.XPlatformPlugin;
 import com.idlefish.flutterboost.interfaces.IFlutterViewContainer;
 import com.idlefish.flutterboost.interfaces.IOperateSyncer;
 import io.flutter.Log;
@@ -29,6 +33,7 @@ import io.flutter.app.FlutterActivity;
 import io.flutter.embedding.android.*;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.FlutterShellArgs;
+import io.flutter.embedding.engine.plugins.activity.ActivityControlSurface;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.platform.PlatformPlugin;
 
@@ -38,7 +43,7 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
 
 
     private static final String TAG = "FlutterActivityAndFragmentDelegate";
-
+    private  static int ACTIVITY_CONTROL_SURFACE_ATTACH_TO_ACTVITY_HASH_CODE=0;
     @NonNull
     private Host host;
     @Nullable
@@ -48,7 +53,7 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
     @Nullable
     private XFlutterView flutterView;
     @Nullable
-    private PlatformPlugin platformPlugin;
+    private XPlatformPlugin platformPlugin;
 
     private boolean isFlutterEngineFromHost;
 
@@ -94,7 +99,7 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
         // TODO(mattcarroll): the PlatformPlugin needs to be reimagined because it implicitly takes
         //                    control of the entire window. This is unacceptable for non-fullscreen
         //                    use-cases.
-        platformPlugin = host.providePlatformPlugin(host.getActivity(), flutterEngine);
+        platformPlugin = host.providePlatformPlugin(flutterEngine);
 
 
         host.configureFlutterEngine(flutterEngine);
@@ -126,14 +131,6 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
     @NonNull
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.v(TAG, "Creating FlutterView.");
-
-
-        flutterEngine.getActivityControlSurface().attachToActivity(
-                host.getActivity(),
-                host.getLifecycle()
-        );
-
-
 
         mSyncer = FlutterBoost.instance().containerManager().generateSyncer(this);
 
@@ -175,13 +172,20 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
         Log.v(TAG, "onResume()");
         ensureAlive();
         flutterEngine.getLifecycleChannel().appIsResumed();
+        if(ACTIVITY_CONTROL_SURFACE_ATTACH_TO_ACTVITY_HASH_CODE==0||
+                ACTIVITY_CONTROL_SURFACE_ATTACH_TO_ACTVITY_HASH_CODE!=this.host.getActivity().hashCode()){
+            flutterEngine.getActivityControlSurface().detachFromActivityForConfigChanges();
+            flutterEngine.getActivityControlSurface().attachToActivity(
+                    host.getActivity(),
+                    host.getLifecycle()
+            );
+            ACTIVITY_CONTROL_SURFACE_ATTACH_TO_ACTVITY_HASH_CODE=this.host.getActivity().hashCode();
+        }
 
-        flutterEngine.getActivityControlSurface().attachToActivity(
-                host.getActivity(),
-                host.getLifecycle()
-        );
 
 
+        if(platformPlugin!=null)
+            platformPlugin.attachToActivity( host.getActivity());
 
 
     }
@@ -190,8 +194,6 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
     public void onPostResume() {
         Log.v(TAG, "onPostResume()");
         ensureAlive();
-//        Utils.setStatusBarLightMode(host.getActivity(), true);
-
     }
 
 
@@ -229,8 +231,13 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
         // Null out the platformPlugin to avoid a possible retain cycle between the plugin, this Fragment,
         // and this Fragment's Activity.
         if (platformPlugin != null) {
-            platformPlugin.destroy();
+            platformPlugin.detachActivity(getContextActivity());
             platformPlugin = null;
+        }
+
+        if(ACTIVITY_CONTROL_SURFACE_ATTACH_TO_ACTVITY_HASH_CODE!=0||
+                ACTIVITY_CONTROL_SURFACE_ATTACH_TO_ACTVITY_HASH_CODE==this.host.getActivity().hashCode()){
+            flutterEngine.getActivityControlSurface().detachFromActivityForConfigChanges();
         }
 
         Utils.fixInputMethodManagerLeak(host.getActivity());
@@ -384,7 +391,7 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
     }
 
     @Override
-    public Map getContainerUrlParams() {
+    public Map<String,Object> getContainerUrlParams() {
         return this.host.getContainerUrlParams();
 
     }
@@ -460,7 +467,7 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
          * Flutter experience should control system chrome.
          */
         @Nullable
-        PlatformPlugin providePlatformPlugin(@Nullable Activity activity, @NonNull FlutterEngine flutterEngine);
+        XPlatformPlugin providePlatformPlugin( @NonNull FlutterEngine flutterEngine);
 
         /**
          * Hook for the host to configure the {@link FlutterEngine} as desired.
@@ -476,7 +483,7 @@ public class FlutterActivityAndFragmentDelegate implements IFlutterViewContainer
 
         String getContainerUrl();
 
-        Map getContainerUrlParams();
+        Map<String ,Object> getContainerUrlParams();
 
 
     }
